@@ -1,10 +1,10 @@
 #Fat Jar Configuration File
-#Fri Aug 09 14:07:56 CST 2013
+#Fri Mar 21 18:25:30 CST 2014
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
 onejar.checkbox=false
-jarname=E\:\\panyingyun\\AutoTools\\autotools.jar
+jarname=E\:\\github\\autotools\\trunk\\autotools.jar
 manifest.mergeall=true
 manifest.mainclass=tools.AutoTools
 manifest.file=<createnew>

@@ -32,14 +32,22 @@ public class AutoTools {
 	private static String orgpkgname;
 	// 原始 ICON
 	private static String orgIconname;
+	// 原始 VersionCode
+	private static String orgVersionCode;
+	// 原始VersionName
+	private static String orgVersionName;
 	// 渠道号列表 map.txt文件读取
 	private static ArrayList<String> channels = new ArrayList<String>();
 	// 包名
-	private static String pkgname = null;
+	private static String newpkgname = null;
 	// 应用名称
-	private static String appname = null;
+	private static String newappname = null;
+	// 版本号
+	private static String newvercode = null;
+	// 版本名称
+	private static String newvername = null;
 	// 图标
-	private static String iconname = null;
+	private static String newiconname = null;
 
 	// 当前目录
 	private static String curDir = null;
@@ -53,18 +61,20 @@ public class AutoTools {
 
 		if (args.length < 2) {
 			System.out
-					.println("usage: java -jar autotools.jar orgapk  pkgname appname(可选) iconname(可选)");
+					.println("usage: java -jar autotools.jar orgapk  pkgname appname(可选) version iconname(可选)");
 			System.out
-					.println("example: java -jar autotools.jar sgz.apk  com.clemu.capcom2013  名将2013(可选) icon1(可选)");
+					.println("example: java -jar autotools.jar sgz.apk  com.clemu.capcom2013  名将2013(可选) 3.2 icon1(可选)");
 			return;
 		}
 
 		orgapk = args[0];
-		pkgname = args[1];
+		newpkgname = args[1];
 		if (args.length > 2)
-			appname = args[2];
+			newappname = args[2];
 		if (args.length > 3)
-			iconname = args[3];
+			newvername = args[3];
+		if (args.length > 4)
+			newiconname = args[4];
 
 		curDir = new File("").getAbsolutePath();
 		ApkInfo info = null;
@@ -76,21 +86,23 @@ public class AutoTools {
 		orgpkgname = info.getPackageName();
 		orgappname = info.getApplicationLable();
 		orgIconname = info.getApplicationIcon();
+		orgVersionCode = info.getVersionCode();
+		orgVersionName = info.getVersionName();
 		System.out.println("orgapk = " + orgapk);
 		System.out.println("orgchannel = " + orgchannel);
 		System.out.println("orgpkgname = " + orgpkgname);
 		System.out.println("orgappname = " + orgappname);
 		System.out.println("orgIconname = " + orgIconname);
+		System.out.println("orgVersionCode = " + orgVersionCode);
+		System.out.println("orgVersionName = " + orgVersionName);
 		System.out.println("curDir = " + curDir);
-		
-		
 
 		// clean org files
 		cleanOrgfiles();
 		// read channels from map.txt
 		readChannels();
 		// modify channels and build apks
-		modifyChannels();
+		autoPkgApks();
 		// delete old apks
 		delApks();
 		// clean org files
@@ -137,7 +149,7 @@ public class AutoTools {
 
 	// 修改string.xml中应用名称
 	private static void modifyAppname() {
-		if (isEmpty(appname))
+		if (isEmpty(newappname))
 			return;
 		String dir = orgapk.split(".apk")[0];
 		File packDir = new File(dir);
@@ -149,7 +161,7 @@ public class AutoTools {
 			String ss = IOUtils
 					.toString(new FileInputStream(f_string), "UTF-8");
 			// System.out.println("替换应用名前 ss = " + ss);
-			ss = ss.replaceAll(orgappname, appname);
+			ss = ss.replaceAll(orgappname, newappname);
 			// System.out.println("替换应用名后 ss = " + ss);
 			IOUtils.write(ss.getBytes("UTF-8"), new FileOutputStream(p_string));
 			System.out.println("应用名称替换 success!!!!");
@@ -160,23 +172,62 @@ public class AutoTools {
 		}
 	}
 
+	// 修改版本号，并且备份AndroidManifest.xml
+	// 之所以要备份，是因为
+	// 循环都是需要对原AndroidManifest.xml进行修改的
+	private static void modifyAndroidManifest(String path, String backupPath) {
+		String cpStr;
+		try {
+			cpStr = IOUtils.toString(new FileInputStream(path), "UTF-8");
+			//替换VERSIONCODE VERSIONNAME
+			if (!isEmpty(newvername)) {
+				System.out.println("newvername = "+newvername);
+				System.out.println("orgVersionCode = " + orgVersionCode);
+				System.out.println("orgVersionName = " + orgVersionName);
+				
+				newvercode = "android:versionCode=\""+(Integer.valueOf(orgVersionCode).intValue()+1)+"\"";
+				orgVersionCode = "android:versionCode=\""+orgVersionCode+"\"";
+				newvername="android:versionName=\""+newvername+"\""; 
+				orgVersionName = "android:versionName=\""+orgVersionName+"\"";
+				System.out.println("newvername = "+newvername);
+				System.out.println("newvercode = "+newvercode);
+				System.out.println("orgVersionCode = " + orgVersionCode);
+				System.out.println("orgVersionName = " + orgVersionName);
+				cpStr = cpStr.replaceFirst(orgVersionCode, newvercode);
+				cpStr = cpStr.replaceFirst(orgVersionName, newvername);
+				System.out.println("版本号替换 success!!!!");
+			}
+			IOUtils.write(cpStr.getBytes("UTF-8"), new FileOutputStream(
+					backupPath));
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("文件路径不存在，备份失败!!!!");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("异常错误，文件备份失败!!!!");
+			e.printStackTrace();
+		}
+
+	}
+
 	// 修改应用图标
 	private static void modifyAppicon() {
-		if (isEmpty(iconname))
+		if (isEmpty(newiconname))
 			return;
 		String dir = orgapk.split(".apk")[0];
 		File packDir = new File(dir);
-		File destFile = new File(packDir.getAbsolutePath()+File.separator+orgIconname);
-		File srcFile = new File(curDir+File.separator+iconname);
+		File destFile = new File(packDir.getAbsolutePath() + File.separator
+				+ orgIconname);
+		File srcFile = new File(curDir + File.separator + newiconname);
 		long len = FileUtils.copyFile(srcFile, destFile);
-		if(len >0){
+		if (len > 0) {
 			System.out.println("应用图标替换 success!!!!");
-		}else{
+		} else {
 			System.out.println("应用图标替换 fail!!!!");
 		}
 	}
 
-	private static void modifyChannels() {
+	private static void autoPkgApks() {
 
 		// 解压 OK!!!
 		String decode = "cmd.exe /C java -jar apktool.jar d -f " + orgapk;
@@ -185,16 +236,14 @@ public class AutoTools {
 		modifyAppname();
 		// 修改应用图标
 		modifyAppicon();
-		// 备份AndroidMainifest.xml
+		// 备份AndroidMainifest.xml和循环修改渠道号，打包不同的渠道号
 		String dir = orgapk.split(".apk")[0];
 		File packDir = new File(dir);
 		try {
 			String p_mani = packDir.getAbsolutePath() + "\\AndroidManifest.xml";
 			String p_main_bak = curDir + "\\AndroidManifest.xml";
-			String cpStr = IOUtils.toString(new FileInputStream(p_mani),
-					"UTF-8");
-			IOUtils.write(cpStr.getBytes("UTF-8"), new FileOutputStream(
-					p_main_bak));
+			// 备份AndroidMainifest.xml 并且 修改版本号
+			modifyAndroidManifest(p_mani, p_main_bak);
 
 			// 创建apk目录
 			File f = new File("apk");
@@ -208,8 +257,8 @@ public class AutoTools {
 				String ssCp = IOUtils.toString(new FileInputStream(p_main_bak),
 						"UTF-8");
 				// System.out.println("修改包名和渠道号之前：ssCp = " + ssCp);
-				ssCp = ssCp.replaceAll("\"" + orgpkgname + "\"", "\"" + pkgname
-						+ "\"");
+				ssCp = ssCp.replaceAll("\"" + orgpkgname + "\"", "\""
+						+ newpkgname + "\"");
 				ssCp = ssCp.replaceAll("\"" + orgchannel + "\"", "\"" + channel
 						+ "\"");
 				// System.out.println("修改包名和渠道号之后：ssCp = " + ssCp);
@@ -243,9 +292,7 @@ public class AutoTools {
 				// 删除签名的临时文件包
 				File signfile = new File(signapk);
 				signfile.delete();
-
 			}
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

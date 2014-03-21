@@ -1,3 +1,3 @@
 @echo on
-java -jar autotools.jar wof.apk com.clemu.wofclc 三国志2014  icon_wof.png
+java -jar autotools.jar wof.apk com.clemu.wofclc 三国志2014 3.2.1
 pause
