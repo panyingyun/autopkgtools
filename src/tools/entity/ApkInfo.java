@@ -1,11 +1,3 @@
-/*
- * @(#)ApkInfo.java		       version: 1.0 
- * Date:2012-1-10
- *
- * Copyright (c) 2011 CFuture09, Institute of Software, 
- * Guangdong Ocean University, Zhanjiang, GuangDong, China.
- * All rights reserved.
- */
 package tools.entity;
 
 import java.util.ArrayList;
@@ -13,14 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <B>ApkInfo</B>
- * <p>
- * 该类封装了一个Apk的信息。包括版本号，支持平台，图标，名称，权限，所需设备特性等。
- * </p>
- * 
- * @author CFuture.Geek_Soledad(66704238@51uc.com)
- */
 public class ApkInfo {
 	public static final String APPLICATION_ICON_120 = "application-icon-120";
 	public static final String APPLICATION_ICON_160 = "application-icon-160";
@@ -285,7 +269,8 @@ public class ApkInfo {
 				+ ",\n applicationIcons=" + applicationIcons
 				+ ",\n applicationIcon=" + applicationIcon
 				+ ",\n impliedFeatures=" + impliedFeatures + ",\n features="
-				+ features + ",\n launchableActivity=" + launchableActivity + "\n]";
+				+ features + ",\n launchableActivity=" + launchableActivity
+				+ "\n]";
 	}
 
 	public String getLaunchableActivity() {

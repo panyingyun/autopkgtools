@@ -1,11 +1,3 @@
-/*
- * @(#)ApkUtil.java		       version: 0.2.1 
- * Date:2012-1-9
- *
- * Copyright (c) 2011 CFuture09, Institute of Software, 
- * Guangdong Ocean University, Zhanjiang, GuangDong, China.
- * All rights reserved.
- */
 package tools.utils;
 
 import java.io.BufferedReader;
@@ -14,19 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import tools.Version;
 import tools.entity.ApkInfo;
 import tools.entity.ImpliedFeature;
 
 /**
  * apk工具类。封装了获取Apk信息的方法。
- * 
- * @author CFuture.Geek_Soledad(66704238@51uc.com)
- * 
- *         <p>
- *         <b>version description</b><br />
- *         V0.2.1 修改程序名字为从路径中获得。
- *         </p>
  */
 public class ApkUtil {
 	public static final String VERSION_CODE = "versionCode";
@@ -100,7 +84,7 @@ public class ApkUtil {
 	private void setApkInfoProperty(ApkInfo apkInfo, String source) {
 		if (source.startsWith(PACKAGE)) {
 			splitPackageInfo(apkInfo, source);
-		} else if(source.startsWith(LAUNCHABLE_ACTIVITY)){
+		} else if (source.startsWith(LAUNCHABLE_ACTIVITY)) {
 			apkInfo.setLaunchableActivity(getPropertyInQuote(source));
 		} else if (source.startsWith(SDK_VERSION)) {
 			apkInfo.setSdkVersion(getPropertyInQuote(source));
@@ -121,7 +105,7 @@ public class ApkUtil {
 		} else if (source.startsWith(USES_IMPLIED_FEATURE)) {
 			apkInfo.addToImpliedFeatures(getFeature(source));
 		} else {
-//			System.out.println(source);
+			// System.out.println(source);
 		}
 	}
 
@@ -181,21 +165,21 @@ public class ApkUtil {
 		}
 	}
 
-//	public static void main(String[] args) {
-//		try {
-//			String demo = "D:/works/app/ApplicationAssistant.apk";
-//			if (args.length > 0) {
-//				if(args[0].equals("-version") || args[0].equals("-v")){
-//					System.out.println("ApkUtil   -by Geek_Soledad");
-//					System.out.println("Version:" + Version.getVersion());
-//					return;
-//				}
-//				demo = args[0];
-//			}
-//			ApkInfo apkInfo = new ApkUtil().getApkInfo(demo);
-//			System.out.println(apkInfo);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	// public static void main(String[] args) {
+	// try {
+	// String demo = "D:/works/app/ApplicationAssistant.apk";
+	// if (args.length > 0) {
+	// if(args[0].equals("-version") || args[0].equals("-v")){
+	// System.out.println("ApkUtil   -by Geek_Soledad");
+	// System.out.println("Version:" + Version.getVersion());
+	// return;
+	// }
+	// demo = args[0];
+	// }
+	// ApkInfo apkInfo = new ApkUtil().getApkInfo(demo);
+	// System.out.println(apkInfo);
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
 }
